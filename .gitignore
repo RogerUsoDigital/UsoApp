@@ -1,0 +1,5 @@
+.env
+vendor
+.phpunit.cache/
+docs/
+public/openapi.json
