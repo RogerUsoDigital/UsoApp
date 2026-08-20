@@ -57,13 +57,18 @@ class IndicadoresChatService
         $numero  = (string) ($dados['numero']  ?? '');
         $indicadores = $dados['indicador_array'] ?? [];
 
-        $dadosBQArray = $this->consultarIndicadores(
-            $indicadores,
-            $cliente,
-            $numero,
-            $contaAuth,
-            $idProjeto
-        );
+        try {
+            $dadosBQArray = $this->consultarIndicadores(
+                $indicadores,
+                $cliente,
+                $numero,
+                $contaAuth,
+                $idProjeto
+            );
+        } catch (RuntimeException $e) {
+            error_log('Erro ao consultar BigQuery: ' . $e->getMessage());
+            return $this->erro('Erro ao consultar os indicadores no BigQuery.');
+        }
 
         // 5. adiciona dados_adicionais
         $dadosBQArray = $this->adicionarDadosAdicionais(
@@ -74,6 +79,10 @@ class IndicadoresChatService
         // 6. monta bodyFinal
         $idChat = $dados['id_chat'] ?? null;
         $portal = (string) ($dados['portal'] ?? '');
+
+        if (($this->config['app']['env'] ?? '') === 'development') {
+            $portal = 'homolog';
+        }
 
         $bodyFinal = $this->montarBodyFinal($idChat, $numero, $dadosBQArray);
 
@@ -244,19 +253,34 @@ class IndicadoresChatService
 
         return match ($indicador) {
             'rechamada_hoje' => sprintf(
-                "SELECT COUNT(*) as total FROM `bigquery-usodigital.views.vw_indicadores_chat_finalizados_diario` WHERE cliente = '%s' AND numero = '%s' AND DATE(created_at) = CURRENT_DATE()",
+                "SELECT COUNT(*) AS total FROM `bigquery-usodigital.views.vw_indicadores_chat_finalizados_diario` WHERE empresa = '%s' AND numero = '%s'",
                 $clienteSanitizado,
                 $numeroSanitizado
             ),
 
             'ultimo_nps' => sprintf(
-                "SELECT nps_score as total FROM bigquery-usodigital.views.vw_indicadores_chat_finalizados_diario WHERE cliente = '%s' AND numero = '%s' ORDER BY created_at DESC LIMIT 1",
+                "SELECT IFNULL(
+                    (
+                        SELECT CAST(nps AS STRING) FROM `bigquery-usodigital.views.vw_indicadores_chat_finalizados_diario`
+                        WHERE empresa = '%s' AND numero = '%s' AND nps IS NOT NULL
+                        ORDER BY CAST(chat_id AS INT64) DESC LIMIT 1
+                    ),
+                    'SEM DADOS'
+                ) AS total",
                 $clienteSanitizado,
                 $numeroSanitizado
             ),
 
             'rechamada_departamento_hoje' => sprintf(
-                "SELECT CONCAT(departamento, ': ', COUNT(*)) as total FROM `bigquery-usodigital.views.vw_indicadores_chat_finalizados_diario` WHERE cliente = '%s' AND numero = '%s' AND DATE(created_at) = CURRENT_DATE() GROUP BY departamento",
+                "SELECT STRING_AGG(
+                    FORMAT('%%s: %%d', departamento, total),
+                    '  ||  '
+                ) AS total
+                FROM (
+                    SELECT departamento, COUNT(*) AS total
+                    FROM `bigquery-usodigital.views.vw_indicadores_chat_finalizados_diario`
+                    WHERE empresa = '%s' AND numero = '%s' GROUP BY departamento
+                )",
                 $clienteSanitizado,
                 $numeroSanitizado
             ),

@@ -99,6 +99,26 @@ class IndicadoresChatServiceTest extends TestCase
         $this->assertArrayHasKey('variables', $resultado);
     }
 
+    public function testQueryDeRechamadaPorDepartamentoNaoInterpretaFormatoDoBigQuery(): void
+    {
+        $service = new IndicadoresChatService(
+            $this->createMock(BigQueryRepository::class),
+            $this->configMock
+        );
+
+        $method = (new \ReflectionClass($service))->getMethod('getQueryIndicador');
+        $query = $method->invoke(
+            $service,
+            'rechamada_departamento_hoje',
+            'NEOBPO TIM LIVE',
+            '5571991062151'
+        );
+
+        $this->assertStringContainsString("FORMAT('%s: %d', departamento, total)", $query);
+        $this->assertStringContainsString("empresa = 'NEOBPO TIM LIVE'", $query);
+        $this->assertStringContainsString("numero = '5571991062151'", $query);
+    }
+
     // -------------------------------------------------------------------------
     // Testes de obterConfiguracaoBanco / portal
     // -------------------------------------------------------------------------

@@ -20,6 +20,12 @@ class IndicadoresRepository
             return;
         }
 
+        if (!class_exists(\mysqli::class)) {
+            throw new RuntimeException(
+                'A extensão PHP mysqli não está habilitada no servidor.'
+            );
+        }
+
         $this->connection = new \mysqli(
             $config['host'],
             $config['username'],

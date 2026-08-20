@@ -46,10 +46,8 @@ class ConsultaController
     {
         $result = $this->service->executar(
             $request->body(),
-            $request->query('emp')
+            $request->query('emp', $request->route('empresa'))
         );
-
-        $result = [];
 
         return Response::json(
             $result,
