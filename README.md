@@ -159,7 +159,7 @@ O bootstrap carrega o autoload do Composer, lê o `.env`, cria o container e des
 | GET | `/swagger` | Swagger UI | Não |
 | GET | `/APIv3/bigquery/orders` | Controller BigQuery | `Auth` ou `Authorization` |
 | POST | `/APIv3/bigquery/consulta/indicadores-chats-finalizados/{empresa}` | Fluxo de indicadores em migração | `Auth` ou `Authorization` |
-| POST | `/APIv3/bigquery/consulta/rechamadasNps/{empresa}` | Placeholder legado | `Auth` ou `Authorization` |
+| POST | `/APIv3/bigquery/consulta/rechamadasNps/{empresa}` | Consulta de rechamadas e NPS migrada | `Auth` ou `Authorization` |
 | POST | `/APIv3/bigquery/consulta/bd-nps/{empresa}` | Placeholder legado | `Auth` ou `Authorization` |
 | POST | `/APIv3/bigquery/consulta/resposta-sms/{empresa}` | Placeholder legado | `Auth` ou `Authorization` |
 | POST | `/APIv3/bigquery/consulta/helpdesk/{empresa}` | Placeholder legado | `Auth` ou `Authorization` |
@@ -208,6 +208,23 @@ Regras preservadas do legado:
 - `ID_CHAT` é único para a inserção.
 - Conflitos usam `error_code` `409`.
 - Credenciais e tokens devem permanecer no `.env`, nunca no README ou no código versionado.
+
+## Rechamadas e NPS
+
+O endpoint `POST /APIv3/bigquery/consulta/rechamadasNps/{empresa}` foi migrado incrementalmente para o fluxo:
+
+```text
+ConsultaController
+    -> RechamadasNpsService
+    -> BigQueryRepository
+    -> BigQuery
+```
+
+O `ConsultaController` recebe o body e o parâmetro `emp` (ou a empresa da rota), enquanto o `RechamadasNpsService` preserva a sequência da função legada: valida o corpo, extrai `cliente`, `numero` e `documento`, valida a empresa, resolve a configuração Google Cloud, monta a query, consulta o BigQuery e monta a resposta.
+
+As quatro combinações originais de filtro por `numero` e `documento` foram preservadas. Os valores são enviados ao `BigQueryRepository` como parâmetros nomeados, sem interpolação direta no SQL.
+
+Há cobertura unitária para a validação de corpo e para a consulta com parâmetros nomeados em [`tests/Services/BigQuery/RechamadasNpsServiceTest.php`](tests/Services/BigQuery/RechamadasNpsServiceTest.php).
 
 ## Configuração
 
