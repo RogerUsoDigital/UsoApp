@@ -23,9 +23,37 @@ return [
             'alares' => 'alares-analytics-usodigital',
         ],
         'autenticacao' => [
-            'usodigital' => $_ENV['GOOGLE_BQ_USO_AUTH'] ?? '',
-            'alares' => $_ENV['GOOGLE_BQ_ALARES_AUTH'] ?? '',
+            'usodigital' => [
+                'type' => $_ENV['USODIGITAL_TYPE'] ?? '',
+                'project_id' => $_ENV['USODIGITAL_PROJECT_ID'] ?? '',
+                'private_key_id' => $_ENV['USODIGITAL_PRIVATE_KEY_ID'] ?? '',
+                'private_key' => $_ENV['USODIGITAL_PRIVATE_KEY'] ?? '',
+                'client_email' => $_ENV['USODIGITAL_CLIENT_EMAIL'] ?? '',
+                'client_id' => $_ENV['USODIGITAL_CLIENT_ID'] ?? '',
+                'auth_uri' => $_ENV['USODIGITAL_AUTH_URI'] ?? '',
+                'token_uri' => $_ENV['USODIGITAL_TOKEN_URI'] ?? '',
+                'auth_provider_x509_cert_url' => $_ENV['USODIGITAL_AUTH_PROVIDER_X509_CERT_URL'] ?? '',
+                'client_x509_cert_url' => $_ENV['USODIGITAL_CLIENT_X509_CERT_URL'] ?? '',
+                'universe_domain' => $_ENV['USODIGITAL_UNIVERSE_DOMAIN'] ?? '',
+            ],
+            'alares' => [
+                'type' => $_ENV['ALARES_TYPE'] ?? '',
+                'project_id' => $_ENV['ALARES_PROJECT_ID'] ?? '',
+                'private_key_id' => $_ENV['ALARES_PRIVATE_KEY_ID'] ?? '',
+                'private_key' => $_ENV['ALARES_PRIVATE_KEY'] ?? '',
+                'client_email' => $_ENV['ALARES_CLIENT_EMAIL'] ?? '',
+                'client_id' => $_ENV['ALARES_CLIENT_ID'] ?? '',
+                'auth_uri' => $_ENV['ALARES_AUTH_URI'] ?? '',
+                'token_uri' => $_ENV['ALARES_TOKEN_URI'] ?? '',
+                'auth_provider_x509_cert_url' => $_ENV['ALARES_AUTH_PROVIDER_X509_CERT_URL'] ?? '',
+                'client_x509_cert_url' => $_ENV['ALARES_CLIENT_X509_CERT_URL'] ?? '',
+                'universe_domain' => $_ENV['ALARES_UNIVERSE_DOMAIN'] ?? '',
+            ],
         ],
+        // 'autenticacao' => [
+        //     'usodigital' => $_ENV['GOOGLE_BQ_USO_AUTH'] ?? '',
+        //     'alares' => $_ENV['GOOGLE_BQ_ALARES_AUTH'] ?? '',
+        // ],
     ],
 
     'tratamentoBigQuery' => [
@@ -442,15 +470,16 @@ return [
             'username' => $_ENV['DB_USODIGITAL_PRO_USERNAME'],
             'password' => $_ENV['DB_USODIGITAL_PRO_PASSWORD'],
         ],
+
+        'homolog' => [
+            'host' => $_ENV['DB_HOST'] ?? '',
+            'port' => $_ENV['DB_PORT'] ?? '',
+            'database' => $_ENV['DB_DATABASE'] ?? '',
+            'username' => $_ENV['DB_USERNAME'] ?? '',
+            'password' => $_ENV['DB_PASSWORD'] ?? '',
+        ],
     ],
 
-    'db' => [
-        'host' => $_ENV['DB_HOST'] ?? '',
-        'port' => $_ENV['DB_PORT'] ?? '',
-        'database' => $_ENV['DB_DATABASE'] ?? '',
-        'username' => $_ENV['DB_USERNAME'] ?? '',
-        'password' => $_ENV['DB_PASSWORD'] ?? '',
-    ],
 
     'http' => [
         'timeout' => (float) ($_ENV['HTTP_TIMEOUT'] ?? 30.0),
