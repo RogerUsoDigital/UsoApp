@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\BigQuery;
 
 use App\Repositories\BigQueryRepository;
-use App\Repositories\IndicadoresRepository;
+use App\Repositories\Bigquery\IndicadoresRepository;
 use RuntimeException;
 
 class IndicadoresChatService

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Repositories;
 
-use App\Repositories\IndicadoresRepository;
+use App\Repositories\Bigquery\IndicadoresRepository;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

@@ -7,7 +7,7 @@ namespace Tests\Services\BigQuery;
 use PHPUnit\Framework\TestCase;
 use App\Services\BigQuery\IndicadoresChatService;
 use App\Repositories\BigQueryRepository;
-use App\Repositories\IndicadoresRepository;
+use App\Repositories\Bigquery\IndicadoresRepository;
 
 class IndicadoresChatServiceTest extends TestCase
 {
